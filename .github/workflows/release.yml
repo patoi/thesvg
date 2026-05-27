@@ -57,9 +57,38 @@ jobs:
           cd packages/svelte && npm run build && cd ../..
 
       - name: Publish to npm
-        run: pnpm changeset publish
-        env:
-          NPM_CONFIG_PROVENANCE: "true"
+        # pnpm changeset publish ships README.md inside the tarball but does
+        # not populate the per-version `readme` field on the npm registry
+        # manifest, which is what npmjs.com renders. To get both correct
+        # readme rendering AND pnpm's workspace-protocol rewriting, we
+        # `pnpm pack` each package (which rewrites `workspace:*` -> real
+        # versions) and then `npm publish <tarball>` (which populates the
+        # readme field on the registry manifest).
+        run: |
+          for PKG_DIR in packages/*/; do
+            PKG_DIR="${PKG_DIR%/}"
+            [ -f "$PKG_DIR/package.json" ] || continue
+            PKG_NAME=$(node -p "require('./$PKG_DIR/package.json').name")
+            PKG_VERSION=$(node -p "require('./$PKG_DIR/package.json').version")
+            PKG_PRIVATE=$(node -p "require('./$PKG_DIR/package.json').private || false")
+            if [ "$PKG_PRIVATE" = "true" ]; then
+              echo "Skipping $PKG_NAME (private)"
+              continue
+            fi
+            if npm view "$PKG_NAME@$PKG_VERSION" version >/dev/null 2>&1; then
+              echo "Skipping $PKG_NAME@$PKG_VERSION (already published)"
+              continue
+            fi
+            echo "Packing and publishing $PKG_NAME@$PKG_VERSION"
+            (
+              cd "$PKG_DIR"
+              # pnpm pack rewrites workspace:* deps to concrete versions
+              TARBALL=$(pnpm pack 2>/dev/null | tail -1)
+              # npm publish populates the readme field on the registry manifest
+              npm publish "$TARBALL" --access public --provenance
+              rm -f "$TARBALL"
+            )
+          done
 
       - name: Create git tags
         run: |

@@ -116943,9 +116943,9 @@
       "Software"
     ],
     "variants": {
-      "default": "/icons/vanio/default.svg",
-      "color": "/icons/vanio/color.svg",
-      "mono": "/icons/vanio/mono.svg"
+      "default": "/icons/vanio-informatika/default.svg",
+      "color": "/icons/vanio-informatika/default.svg",
+      "mono": "/icons/vanio-informatika/mono.svg"
     },
     "url": "https://vanio.hu",
     "dateAdded": "2026-06-01",

@@ -63545,6 +63545,23 @@
     "collection": "brands"
   },
   {
+    "slug": "hiver",
+    "title": "Hiver",
+    "aliases": [],
+    "hex": "FDB022",
+    "categories": [
+      "Software",
+      "Productivity"
+    ],
+    "variants": {
+      "default": "/icons/hiver/default.svg"
+    },
+    "license": "Trademark",
+    "url": "https://www.hiverhq.com",
+    "dateAdded": "2026-06-07",
+    "collection": "brands"
+  },
+  {
     "slug": "homarr",
     "title": "Homarr",
     "aliases": [],
